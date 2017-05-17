@@ -8,9 +8,22 @@ import android.os.IBinder;
  * Connects the android system with the {@link PhonyAuthenticator}.
  */
 public class PhonyAuthenticatorService extends Service {
+
+    // Instance field that stores the authenticator object
+    private PhonyAuthenticator mAuthenticator;
+
+    @Override
+    public void onCreate() {
+        // Create a new authenticator object
+        mAuthenticator = new PhonyAuthenticator(this);
+    }
+
+    /*
+     * When the system binds to this Service to make the RPC call
+     * return the authenticator's IBinder.
+     */
     @Override
     public IBinder onBind(Intent intent) {
-        PhonyAuthenticator authenticator = new PhonyAuthenticator(this);
-        return authenticator.getIBinder();
+        return mAuthenticator.getIBinder();
     }
 }
