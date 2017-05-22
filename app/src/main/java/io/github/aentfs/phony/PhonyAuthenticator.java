@@ -6,6 +6,7 @@ import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -13,6 +14,8 @@ import android.util.Log;
  * Authenticator for communication with the phony server.
  */
 public class PhonyAuthenticator extends AbstractAccountAuthenticator {
+
+    public final static String AUTH_TOKEN_TYPE = "Full access";
 
     private String TAG = "PhonyAuthenticator";
     private final Context mContext;
@@ -35,15 +38,13 @@ public class PhonyAuthenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
         Log.d(TAG, "addAccount: called.");
 
+        final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+        intent.putExtra(AuthenticatorActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+
         final Bundle bundle = new Bundle();
-
-        bundle.putString(AccountManager.KEY_ACCOUNT_NAME, "Test Account");
-        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-        bundle.putString(AccountManager.KEY_AUTHTOKEN, "123456");
-
-        final Account account = new Account("Test Account", accountType);
-        AccountManager.get(mContext).addAccountExplicitly(account, null, null);
-
+        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
         return bundle;
     }
 
