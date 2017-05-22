@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -140,8 +141,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     }
 
     private boolean isPhoneValid(String phone) {
-        // TODO: Replace this with your own logic
-        return phone.contains("+");
+        return PhoneNumberUtils.isGlobalPhoneNumber(phone);
     }
 
     private boolean isPasswordValid(String password) {
