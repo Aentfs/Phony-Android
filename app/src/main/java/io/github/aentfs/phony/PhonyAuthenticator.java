@@ -3,6 +3,7 @@ package io.github.aentfs.phony;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.os.Bundle;
@@ -34,7 +35,16 @@ public class PhonyAuthenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
         Log.d(TAG, "addAccount: called.");
 
-        return null;
+        final Bundle bundle = new Bundle();
+
+        bundle.putString(AccountManager.KEY_ACCOUNT_NAME, "Test Account");
+        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+        bundle.putString(AccountManager.KEY_AUTHTOKEN, "123456");
+
+        final Account account = new Account("Test Account", accountType);
+        AccountManager.get(mContext).addAccountExplicitly(account, null, null);
+
+        return bundle;
     }
 
     @Override
