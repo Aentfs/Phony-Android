@@ -6,7 +6,6 @@ import android.os.IBinder;
 
 /**
  * Connects the android system with the {@link PhonyAuthenticator}.
- * BLA BLA
  */
 
 public class PhonyAuthenticatorService extends Service {
