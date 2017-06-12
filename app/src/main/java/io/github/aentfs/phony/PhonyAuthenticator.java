@@ -17,7 +17,7 @@ public class PhonyAuthenticator extends AbstractAccountAuthenticator {
 
     public final static String AUTH_TOKEN_TYPE = "Full access";
 
-    private String TAG = "PhonyAuthenticator";
+    private final String TAG = "PhonyAuthenticator";
     private final Context mContext;
 
     public PhonyAuthenticator(Context context) {

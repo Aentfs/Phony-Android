@@ -9,11 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <service android:name=".PhonyAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
-
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
@@ -21,7 +21,7 @@
 
         <activity
             android:name=".AuthenticatorActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
     </application>
 
 </manifest>
