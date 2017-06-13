@@ -1,4 +1,4 @@
-package io.github.aentfs.phony;
+package io.github.aentfs.phony.authenticator;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

@@ -1,4 +1,4 @@
-package io.github.aentfs.phony;
+package io.github.aentfs.phony.phone;
 
 import android.content.Intent;
 import android.telecom.Connection;

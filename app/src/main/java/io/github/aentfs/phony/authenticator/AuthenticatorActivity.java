@@ -1,19 +1,13 @@
-package io.github.aentfs.phony;
+package io.github.aentfs.phony.authenticator;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.drawable.Icon;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telecom.PhoneAccount;
-import android.telecom.PhoneAccountHandle;
-import android.telecom.TelecomManager;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +18,9 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import io.github.aentfs.phony.R;
+import io.github.aentfs.phony.phone.PhonyUtil;
 
 /**
  * A login screen that offers login via phone no./password.
@@ -255,24 +252,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             mAccountManager.addAccountExplicitly(account, accountPassword, null);
             mAccountManager.setAuthToken(account, PhonyAuthenticator.AUTH_TOKEN_TYPE, authtoken);
 
-            PhoneAccountHandle accountHandle = new PhoneAccountHandle(
-                    new ComponentName(this.getApplicationContext(), PhonyConnectionService.class),
-                    accountName);
-
-            PhoneAccount phone = PhoneAccount.builder(accountHandle, getResources().getString(R.string.app_name))
-                    .setIcon(Icon.createWithResource(getBaseContext(), R.mipmap.ic_launcher_round))
-                    .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
-                    .addSupportedUriScheme(PhoneAccount.SCHEME_TEL)
-                    .setAddress(Uri.parse("tel:" + accountName))
-                    .build();
-
-            TelecomManager telecomManager = (TelecomManager) getSystemService(TELECOM_SERVICE);
-
-            telecomManager.registerPhoneAccount(phone);
-
-            // Let the user enable our phone account
-            // TODO Show toast so the user knows whats happening
-            startActivity(new Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS));
+            // Register the phone account
+            PhonyUtil.registerNewPhoneAccount(getApplicationContext(), accountName);
         } else {
             Log.d(TAG, "finishLogin: set password.");
 
