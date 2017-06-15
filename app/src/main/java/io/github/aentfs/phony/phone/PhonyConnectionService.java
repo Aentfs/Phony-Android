@@ -44,7 +44,9 @@ public class PhonyConnectionService extends ConnectionService {
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
         Log.d(TAG, "onCreateOutgoingConnection: called.");
 
-        return super.onCreateOutgoingConnection(connectionManagerPhoneAccount, request);
+        PhonyConnection connection = new PhonyConnection();
+
+        return connection;
     }
 
     @Override
