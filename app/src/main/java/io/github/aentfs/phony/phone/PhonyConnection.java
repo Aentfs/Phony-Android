@@ -13,7 +13,7 @@ public final class PhonyConnection extends Connection {
 
     public PhonyConnection()
     {
-        setInitialized();
+        setInitializing();
     }
 
     @Override

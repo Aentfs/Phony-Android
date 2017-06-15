@@ -7,6 +7,7 @@ import android.telecom.ConnectionService;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.RemoteConference;
 import android.telecom.RemoteConnection;
+import android.telecom.TelecomManager;
 import android.util.Log;
 
 public class PhonyConnectionService extends ConnectionService {
@@ -45,6 +46,11 @@ public class PhonyConnectionService extends ConnectionService {
         Log.d(TAG, "onCreateOutgoingConnection: called.");
 
         PhonyConnection connection = new PhonyConnection();
+
+        connection.setAddress(request.getAddress(), TelecomManager.PRESENTATION_ALLOWED);
+        connection.setAudioModeIsVoip(true);
+
+        connection.setInitialized();
 
         return connection;
     }
