@@ -8,7 +8,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -23,7 +22,7 @@ import io.github.aentfs.phony.R;
 import io.github.aentfs.phony.phone.PhonyUtil;
 
 /**
- * A login screen that offers login via phone no./password.
+ * A login screen that offers login for SIP Server.
  */
 public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
@@ -39,8 +38,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private EditText mPhoneView;
+    private EditText mUsernameView;
     private EditText mPasswordView;
+    private EditText mServerAddressView;
+    private EditText mProxyAddressView;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -52,9 +53,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         mAccountManager = AccountManager.get(getBaseContext());
 
         // Set up the login form.
-        mPhoneView = (EditText) findViewById(R.id.phone);
+        mUsernameView = (EditText) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mServerAddressView = (EditText) findViewById(R.id.server_address);
+        mProxyAddressView = (EditText) findViewById(R.id.proxy_address);
+
+
+
+        mProxyAddressView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
@@ -65,8 +71,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             }
         });
 
-        Button mPhoneSignInButton = (Button) findViewById(R.id.phone_sign_in_button);
-        mPhoneSignInButton.setOnClickListener(new OnClickListener() {
+        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
+        mSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
@@ -79,7 +85,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
     /**
      * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid phone no., missing fields, etc.), the
+     * If there are form errors (invalid server address, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
@@ -88,12 +94,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         }
 
         // Reset errors.
-        mPhoneView.setError(null);
+        mUsernameView.setError(null);
         mPasswordView.setError(null);
+        mServerAddressView.setError(null);
+        mProxyAddressView.setError(null);
 
         // Store values at the time of the login attempt.
-        String phone = mPhoneView.getText().toString();
+        String username = mUsernameView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String serverAddress = mServerAddressView.getText().toString();
+        String proxyAddress = mProxyAddressView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -105,14 +115,31 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             cancel = true;
         }
 
-        // Check for a valid phone address.
-        if (TextUtils.isEmpty(phone)) {
-            mPhoneView.setError(getString(R.string.error_field_required));
-            focusView = mPhoneView;
+        // Check for a valid server address.
+        if (TextUtils.isEmpty(username)) {
+            mUsernameView.setError(getString(R.string.error_field_required));
+            focusView = mUsernameView;
             cancel = true;
-        } else if (!isPhoneValid(phone)) {
-            mPhoneView.setError(getString(R.string.error_invalid_phone));
-            focusView = mPhoneView;
+        } else if (!isUsernameValid(username)) {
+            mUsernameView.setError(getString(R.string.error_incorrect_username));
+            focusView = mUsernameView;
+            cancel = true;
+        }
+
+        // Check for a valid server address.
+        if (TextUtils.isEmpty(serverAddress)) {
+            mServerAddressView.setError(getString(R.string.error_field_required));
+            focusView = mServerAddressView;
+            cancel = true;
+        } else if (!isServerValid(serverAddress)) {
+            mServerAddressView.setError(getString(R.string.error_incorrect_server_address));
+            focusView = mServerAddressView;
+            cancel = true;
+        }
+
+        if (!isProxyAddressValid(proxyAddress)) {
+            mProxyAddressView.setError(getString(R.string.error_incorrect_proxy_address));
+            focusView = mProxyAddressView;
             cancel = true;
         }
 
@@ -124,18 +151,28 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(phone, password);
+            mAuthTask = new UserLoginTask(username, password, serverAddress, proxyAddress);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isPhoneValid(String phone) {
-        return PhoneNumberUtils.isGlobalPhoneNumber(phone);
+    private boolean isUsernameValid(String username) {
+        return !username.isEmpty() && !username.contains(".");
     }
 
     private boolean isPasswordValid(String password) {
         // TODO: Replace this with your own logic
         return password.length() > 4;
+    }
+
+    private boolean isServerValid(String serverAddress)
+    {
+        return !serverAddress.isEmpty() && serverAddress.contains(".");
+    }
+
+    private boolean isProxyAddressValid(String proxyAddress)
+    {
+        return proxyAddress.isEmpty() || proxyAddress.contains(".");
     }
 
     /**
@@ -172,13 +209,17 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
      */
     private class UserLoginTask extends AsyncTask<Void, Void, Intent> {
 
-        private final String mPhone;
+        private final String mUsername;
         private final String mPassword;
+        private final String mServerAddress;
+        private final String mProxyAddress;
         private final String mAccountType;
 
-        UserLoginTask(String phone, String password) {
-            mPhone = phone;
+        UserLoginTask(String username, String password, String serverAddress, String proxyAddress) {
+            mUsername = username;
             mPassword = password;
+            mServerAddress = serverAddress;
+            mProxyAddress = proxyAddress;
             mAccountType = getIntent().getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
         }
 
@@ -201,10 +242,12 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 // TODO get auth token from server
                 authtoken = "123456";
 
-                data.putString(AccountManager.KEY_ACCOUNT_NAME, mPhone);
+                data.putString(AccountManager.KEY_ACCOUNT_NAME, mUsername);
                 data.putString(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
                 data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
                 data.putString(AccountManager.KEY_PASSWORD, mPassword);
+                data.putString(PhonyAuthenticator.KEY_SERVER_ADDRESS, mServerAddress);
+                data.putString(PhonyAuthenticator.KEY_PROXY_ADDRESS, mProxyAddress);
 
             } catch (Exception e) {
                 data.putString(AccountManager.KEY_ERROR_MESSAGE, e.getMessage());
@@ -238,8 +281,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
     private void finishLogin(Intent intent) {
         Log.d(TAG, "finishLogin: called.");
 
-        String accountName = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+        String accountUser = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         String accountPassword = intent.getStringExtra(AccountManager.KEY_PASSWORD);
+        String accountServerAddress = intent.getStringExtra(PhonyAuthenticator.KEY_SERVER_ADDRESS);
+        String accountProxyAddress = intent.getStringExtra(PhonyAuthenticator.KEY_PROXY_ADDRESS);
+
+        String accountName = accountUser + "@" + accountServerAddress;
+
         final Account account = new Account(accountName, intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE));
 
         if (getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false)) {
@@ -247,9 +295,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
             String authtoken = intent.getStringExtra(AccountManager.KEY_AUTHTOKEN);
 
+            Bundle extras = new Bundle();
+            extras.putString(PhonyAuthenticator.KEY_SERVER_ADDRESS, accountServerAddress);
+            extras.putString(PhonyAuthenticator.KEY_PROXY_ADDRESS, accountProxyAddress);
+
             // Creating the account on the device and setting the auth token we got
             // (Not setting the auth token will cause another call to the server to authenticate the user)
-            mAccountManager.addAccountExplicitly(account, accountPassword, null);
+            mAccountManager.addAccountExplicitly(account, accountPassword, extras);
             mAccountManager.setAuthToken(account, PhonyAuthenticator.AUTH_TOKEN_TYPE, authtoken);
 
             // Register the phone account

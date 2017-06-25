@@ -16,6 +16,8 @@ import android.util.Log;
 public class PhonyAuthenticator extends AbstractAccountAuthenticator {
 
     public final static String AUTH_TOKEN_TYPE = "Full access";
+    public final static String KEY_SERVER_ADDRESS = "KEY_SERVER_ADDRESS";
+    public final static String KEY_PROXY_ADDRESS = "KEY_PROXY_ADDRESS";
 
     private final String TAG = "PhonyAuthenticator";
     private final Context mContext;

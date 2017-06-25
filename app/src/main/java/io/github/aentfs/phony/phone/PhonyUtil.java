@@ -33,8 +33,8 @@ public final class PhonyUtil {
         PhoneAccount phone = PhoneAccount.builder(accountHandle, context.getResources().getString(R.string.app_name))
                 .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_round))
                 .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
-                .addSupportedUriScheme(PhoneAccount.SCHEME_TEL)
-                .setAddress(Uri.parse("tel:" + accountName))
+                .addSupportedUriScheme(PhoneAccount.SCHEME_SIP)
+                .setAddress(Uri.parse("sip:" + accountName))
                 .build();
 
         TelecomManager telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
