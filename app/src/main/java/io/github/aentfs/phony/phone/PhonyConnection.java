@@ -22,6 +22,8 @@ public final class PhonyConnection extends Connection {
 
         @Override
         public void onCallEstablished(SipAudioCall call) {
+            Log.d(TAG, "onCallEstablished: called.");
+
             call.startAudio();
 
             if (call.isMuted()) {
@@ -33,24 +35,27 @@ public final class PhonyConnection extends Connection {
 
         @Override
         public void onCallEnded(SipAudioCall call) {
+            Log.d(TAG, "onCallEnded: called.");
+
             PhonyConnection.this.setDisconnected(new DisconnectCause(DisconnectCause.REMOTE));
         }
     };
 
     public PhonyConnection(SipAudioCall sipCall) throws SipException {
+        Log.d(TAG, "PhonyConnection: called.");
+
         setInitializing();
-
         setAudioModeIsVoip(true);
-
         setConnectionCapabilities(CAPABILITY_MUTE);
 
         mSipCall = sipCall;
-
         mSipCall.setListener(mSipListener);
     }
 
     @Override
     public void onCallAudioStateChanged(CallAudioState state) {
+        Log.d(TAG, "onCallAudioStateChanged: called.");
+
         if (state.isMuted() != mSipCall.isMuted()) {
             mSipCall.toggleMute();
         }
