@@ -6,6 +6,7 @@ import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.net.sip.SipProfile;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import io.github.aentfs.phony.R;
 import io.github.aentfs.phony.phone.PhonyUtil;
+import io.github.aentfs.phony.sip.PhonySipUtil;
 
 /**
  * A login screen that offers login for SIP Server.
@@ -238,6 +240,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
                 // TODO get auth token from server
                 authtoken = "123456";
 
+                // Create the SIP account first, so that we can abort cleanly
+                SipProfile sipProfile = PhonySipUtil.createSipProfile(mUsername, mPassword, mServerAddress, mProxyAddress);
+
+                PhonySipUtil.getSipManager(getBaseContext()).open(sipProfile);
+
                 data.putString(AccountManager.KEY_ACCOUNT_NAME, mUsername);
                 data.putString(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
                 data.putString(AccountManager.KEY_AUTHTOKEN, authtoken);
@@ -301,6 +308,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
             mAccountManager.setAuthToken(account, PhonyAuthenticator.AUTH_TOKEN_TYPE, authtoken);
 
             // Register the phone account
+            // TODO We should also request the telefon state permission (USE_SIP)
             PhonyUtil.registerNewPhoneAccount(getApplicationContext(), accountName);
         } else {
             Log.d(TAG, "finishLogin: set password.");

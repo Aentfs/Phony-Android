@@ -10,11 +10,13 @@ import java.text.ParseException;
  * Utility class for interacting with the SIP system.
  */
 public class PhonySipUtil {
+    
+    private static SipManager mSipManager = null;
 
+    public static final int EXPIRY_TIME = 60;
+    
     private PhonySipUtil() {//empty
     }
-
-    private static SipManager mSipManager = null;
 
     /**
      * Get the sip account manager for the current context.
@@ -24,7 +26,7 @@ public class PhonySipUtil {
      */
     public static SipManager getSipManager(Context context) {
         if (mSipManager == null) {
-            mSipManager = SipManager.newInstance(context);
+            mSipManager = SipManager.newInstance(context.getApplicationContext());
         }
 
         return mSipManager;
