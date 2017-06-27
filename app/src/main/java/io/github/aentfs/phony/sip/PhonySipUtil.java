@@ -10,11 +10,11 @@ import java.text.ParseException;
  * Utility class for interacting with the SIP system.
  */
 public class PhonySipUtil {
-    
+
     private static SipManager mSipManager = null;
 
     public static final int EXPIRY_TIME = 60;
-    
+
     private PhonySipUtil() {//empty
     }
 
@@ -32,6 +32,16 @@ public class PhonySipUtil {
         return mSipManager;
     }
 
+    /**
+     * Create a {@link SipProfile} to use as backend.
+     *
+     * @param username     The username at the service.
+     * @param password     The password for authentication.
+     * @param domain       The domain for the service.
+     * @param proxyAddress A proxy to connect to.
+     * @return The build {@link SipProfile}.
+     * @throws ParseException If the Sip Uri can not be parsed.
+     */
     public static SipProfile createSipProfile(String username, String password, String domain, String proxyAddress) throws ParseException {
         SipProfile.Builder builder = new SipProfile.Builder(username, domain);
         builder.setPassword(password)

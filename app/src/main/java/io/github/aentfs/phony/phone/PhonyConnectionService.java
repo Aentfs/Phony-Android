@@ -9,8 +9,6 @@ import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
 import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
-import android.telecom.RemoteConference;
-import android.telecom.RemoteConnection;
 import android.telecom.TelecomManager;
 import android.util.Log;
 
@@ -23,26 +21,6 @@ public class PhonyConnectionService extends ConnectionService {
     public static final String EXTRA_PHONE_ACCOUNT = "KEY_PHONE_ACCOUNT";
 
     public static final String EXTRA_INCOMING_CALL_INTENT = "KEY_PHONE_ACCOUNT";
-
-    public PhonyConnectionService() {
-        super();
-
-        Log.d(TAG, "PhonyConnectionService: called.");
-    }
-
-    @Override
-    public void onCreate() {
-        Log.d(TAG, "onCreate: called.");
-
-        super.onCreate();
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind: called.");
-
-        return super.onUnbind(intent);
-    }
 
     @Override
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
@@ -89,26 +67,5 @@ public class PhonyConnectionService extends ConnectionService {
             e.printStackTrace();
             return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.ERROR, "SipExecption", "Check the stack trace for more information.", e.getLocalizedMessage()));
         }
-    }
-
-    @Override
-    public void onConference(Connection connection1, Connection connection2) {
-        Log.d(TAG, "onConference: called.");
-
-        super.onConference(connection1, connection2);
-    }
-
-    @Override
-    public void onRemoteConferenceAdded(RemoteConference conference) {
-        Log.d(TAG, "onRemoteConferenceAdded: called.");
-
-        super.onRemoteConferenceAdded(conference);
-    }
-
-    @Override
-    public void onRemoteExistingConnectionAdded(RemoteConnection connection) {
-        Log.d(TAG, "onRemoteExistingConnectionAdded: called.");
-
-        super.onRemoteExistingConnectionAdded(connection);
     }
 }
