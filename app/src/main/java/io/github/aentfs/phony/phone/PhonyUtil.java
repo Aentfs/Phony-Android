@@ -20,15 +20,26 @@ public final class PhonyUtil {
     }
 
     /**
+     * Create a {@link PhoneAccountHandle} for the given parameter.
+     *
+     * @param context The context to use for the {@link ComponentName}.
+     * @param accountName The name of the account. Normaly the SIP URI.
+     * @return The build {@link PhoneAccountHandle}.
+     */
+    public static PhoneAccountHandle createPhoneAccountHandle(Context context, String accountName) {
+        return new PhoneAccountHandle(
+                new ComponentName(context, PhonyConnectionService.class),
+                accountName);
+    }
+
+    /**
      * Create a new {@link PhoneAccount} and register it with the system.
      *
      * @param context     The context to use for finding the services and resources.
      * @param accountName The name of the account to add - must be an international phonenumber.
      */
     public static void registerNewPhoneAccount(Context context, String accountName) {
-        PhoneAccountHandle accountHandle = new PhoneAccountHandle(
-                new ComponentName(context, PhonyConnectionService.class),
-                accountName);
+        PhoneAccountHandle accountHandle = createPhoneAccountHandle(context, accountName);
 
         PhoneAccount phone = PhoneAccount.builder(accountHandle, context.getResources().getString(R.string.app_name))
                 .setIcon(Icon.createWithResource(context, R.mipmap.ic_launcher_round))

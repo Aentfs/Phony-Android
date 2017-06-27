@@ -44,6 +44,12 @@
             </intent-filter>
         </service>
 
+        <receiver android:name=".sip.IncomingCallReceiver">
+            <intent-filter>
+                <action android:name="io.github.aentfs.phony.INCOMING_CALL" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".authenticator.AuthenticatorActivity"
             android:label="@string/title_activity_login" />

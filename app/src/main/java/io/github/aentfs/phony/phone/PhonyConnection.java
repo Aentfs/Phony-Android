@@ -7,6 +7,8 @@ import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.util.Log;
 
+import io.github.aentfs.phony.sip.PhonySipUtil;
+
 /**
  * Handles the {@link Connection} for calling via the backend.
  */
@@ -91,13 +93,25 @@ public final class PhonyConnection extends Connection {
     public void onAnswer() {
         Log.d(TAG, "onAnswer: called.");
 
-        super.onAnswer();
+        try {
+            mSipCall.answerCall(PhonySipUtil.EXPIRY_TIME);
+        } catch (SipException e) {
+            e.printStackTrace();
+
+            setDisconnected(new DisconnectCause(DisconnectCause.ERROR, "SipExecption", "Check the stack trace for more information.", e.getLocalizedMessage()));
+        }
     }
 
     @Override
     public void onReject() {
         Log.d(TAG, "onReject: called.");
 
-        super.onReject();
+        try {
+            mSipCall.endCall();
+        } catch (SipException e) {
+            e.printStackTrace();
+
+            setDisconnected(new DisconnectCause(DisconnectCause.ERROR, "SipExecption", "Check the stack trace for more information.", e.getLocalizedMessage()));
+        }
     }
 }

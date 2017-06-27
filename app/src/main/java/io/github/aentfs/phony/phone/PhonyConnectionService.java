@@ -20,6 +20,10 @@ public class PhonyConnectionService extends ConnectionService {
 
     private static final String TAG = "PhonyConnectionService";
 
+    public static final String EXTRA_PHONE_ACCOUNT = "KEY_PHONE_ACCOUNT";
+
+    public static final String EXTRA_INCOMING_CALL_INTENT = "KEY_PHONE_ACCOUNT";
+
     public PhonyConnectionService() {
         super();
 
@@ -44,7 +48,28 @@ public class PhonyConnectionService extends ConnectionService {
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
         Log.d(TAG, "onCreateIncomingConnection: called.");
 
-        return super.onCreateIncomingConnection(connectionManagerPhoneAccount, request);
+        if (request.getExtras() == null) {
+            return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.ERROR, "No extras on request."));
+        }
+
+        Intent sipIntent = request.getExtras().getParcelable(EXTRA_INCOMING_CALL_INTENT);
+        if (sipIntent == null) {
+            return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.ERROR, "No SIP intent."));
+        }
+
+        try {
+            SipAudioCall audioCall = PhonySipUtil.getSipManager(this).takeAudioCall(sipIntent, null);
+
+            PhonyConnection connection = new PhonyConnection(audioCall);
+
+            connection.setAddress(Uri.parse(audioCall.getPeerProfile().getUriString()), TelecomManager.PRESENTATION_ALLOWED);
+            connection.setInitialized();
+
+            return connection;
+        } catch (SipException e) {
+            e.printStackTrace();
+            return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.ERROR, "SipExecption", "Check the stack trace for more information.", e.getLocalizedMessage()));
+        }
     }
 
     @Override
@@ -52,7 +77,7 @@ public class PhonyConnectionService extends ConnectionService {
         Log.d(TAG, "onCreateOutgoingConnection: called.");
 
         try {
-            SipAudioCall audioCall = PhonySipUtil.getSipManager(getApplicationContext()).makeAudioCall(connectionManagerPhoneAccount.getId(), Uri.decode(request.getAddress().toString()), null, PhonySipUtil.EXPIRY_TIME);
+            SipAudioCall audioCall = PhonySipUtil.getSipManager(this).makeAudioCall(connectionManagerPhoneAccount.getId(), Uri.decode(request.getAddress().toString()), null, PhonySipUtil.EXPIRY_TIME);
 
             PhonyConnection connection = new PhonyConnection(audioCall);
 
@@ -62,7 +87,7 @@ public class PhonyConnectionService extends ConnectionService {
             return connection;
         } catch (SipException e) {
             e.printStackTrace();
-            return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.ERROR, "SipExeption", "Check the stack trace for more information.", e.getLocalizedMessage()));
+            return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.ERROR, "SipExecption", "Check the stack trace for more information.", e.getLocalizedMessage()));
         }
     }
 

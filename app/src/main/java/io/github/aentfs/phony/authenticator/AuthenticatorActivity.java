@@ -5,6 +5,7 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.sip.SipProfile;
 import android.os.AsyncTask;
@@ -20,6 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import io.github.aentfs.phony.R;
+import io.github.aentfs.phony.phone.PhonyConnectionService;
 import io.github.aentfs.phony.phone.PhonyUtil;
 import io.github.aentfs.phony.sip.PhonySipUtil;
 
@@ -242,8 +244,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
 
                 // Create the SIP account first, so that we can abort cleanly
                 SipProfile sipProfile = PhonySipUtil.createSipProfile(mUsername, mPassword, mServerAddress, mProxyAddress);
-
-                PhonySipUtil.getSipManager(getBaseContext()).open(sipProfile);
+                Intent intent = new Intent();
+                intent.setAction("io.github.aentfs.phony.INCOMING_CALL");
+                intent.putExtra(PhonyConnectionService.EXTRA_PHONE_ACCOUNT, mUsername + "@" + mServerAddress);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, Intent.FILL_IN_DATA);
+                PhonySipUtil.getSipManager(getBaseContext()).open(sipProfile, pendingIntent, null);
 
                 data.putString(AccountManager.KEY_ACCOUNT_NAME, mUsername);
                 data.putString(AccountManager.KEY_ACCOUNT_TYPE, mAccountType);
