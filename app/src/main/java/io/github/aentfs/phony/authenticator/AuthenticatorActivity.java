@@ -58,8 +58,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         mServerAddressView = (EditText) findViewById(R.id.server_address);
         mProxyAddressView = (EditText) findViewById(R.id.proxy_address);
 
-
-
         mProxyAddressView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -165,13 +163,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         return password.length() > 4;
     }
 
-    private boolean isServerValid(String serverAddress)
-    {
+    private boolean isServerValid(String serverAddress) {
         return !serverAddress.isEmpty() && serverAddress.contains(".");
     }
 
-    private boolean isProxyAddressValid(String proxyAddress)
-    {
+    private boolean isProxyAddressValid(String proxyAddress) {
         return proxyAddress.isEmpty() || proxyAddress.contains(".");
     }
 
