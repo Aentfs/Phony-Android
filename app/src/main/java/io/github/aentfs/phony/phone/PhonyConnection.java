@@ -38,6 +38,8 @@ public final class PhonyConnection extends Connection {
             Log.d(TAG, "onCallEnded: called.");
 
             PhonyConnection.this.setDisconnected(new DisconnectCause(DisconnectCause.REMOTE));
+
+            PhonyConnection.this.destroy();
         }
     };
 
